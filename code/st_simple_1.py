@@ -1,15 +1,9 @@
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-from data_paths import epa_fuel_economy_summary
-
-src_file = epa_fuel_economy_summary()
+src_file = Path.cwd() / "data" / "raw" / "EPA_fuel_economy_summary.csv"
 df = pd.read_csv(src_file)
 
 fig = px.histogram(

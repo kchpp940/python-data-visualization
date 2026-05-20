@@ -1,62 +1,94 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-import pandas as pd
 import streamlit as st
 import plotly.express as px
 import altair as alt
 
-from data_paths import epa_fuel_economy_summary
+from st_filter_utils import (
+    load_data,
+    make_options,
+    year_range,
+    resolve_make_selection,
+    filter_data,
+    MAKE_SELECT_KEY,
+    PREV_MAKE_KEY,
+)
 
-@st.cache()
-def load_data():
-    src_file = epa_fuel_economy_summary()
-    raw_df = pd.read_csv(src_file)
-    return raw_df
 
-# Load data and determine valid values
-df = load_data()
-min_year = int(df["year"].min())
-max_year = int(df["year"].max())
-valid_makes = sorted(df["make"].unique())
+st.set_page_config(layout="wide")
 
-# Setup the UI
+
+@st.cache_data()
+def _load():
+    return load_data()
+
+
+df = _load()
+min_year, max_year = year_range(df)
+valid_makes = make_options(df)
+
+# Initialise the widget key on first run so the multiselect always reads
+# from session state (and we can mutate it later via session state).
+if MAKE_SELECT_KEY not in st.session_state:
+    st.session_state[MAKE_SELECT_KEY] = ["ALL"]
+
+# ---------- UI ----------
 st.title("Simple Example")
-make = st.multiselect("Select a make:", valid_makes)
-year_range = st.slider(
+
+make = st.multiselect(
+    "Select a make:",
+    valid_makes,
+    key=MAKE_SELECT_KEY,
+)
+
+year_range_val = st.slider(
     label="Year range",
     min_value=min_year,
     max_value=max_year,
     value=(min_year, max_year),
 )
 
-# Filter data based on inputs
-year_filter = df["year"].between(year_range[0], year_range[1])
-make_filter = df["make"].isin(make)
+# ---------- Normalise make selection (ALL ⇄ specific brands) ----------
+previous = st.session_state.get(PREV_MAKE_KEY)
+resolved, _ = resolve_make_selection(make, previous)
 
-plot_df = df[make_filter & year_filter]
+# If the resolution changed the selection, update session state and
+# rerun so the widget reflects the new value.
+if resolved != make:
+    st.session_state[MAKE_SELECT_KEY] = resolved
+    st.session_state[PREV_MAKE_KEY] = resolved
+    st.rerun()
 
-avg_fuel_economy = plot_df["fuelCost08"].mean().round(0)
-st.metric("Average", avg_fuel_economy)
+# Remember this run's selection for the next one.
+st.session_state[PREV_MAKE_KEY] = resolved
+make = resolved
 
-# Plot the data
-fig = px.histogram(
-    plot_df,
-    x="fuelCost08",
-    color="class_summary",
-    labels={"fuelCost08": "Annual Fuel Cost"},
-    nbins=40,
-    title="Fuel Cost Distribution",
-)
+# ---------- Filter ----------
+plot_df = filter_data(df, make, year_range_val[0], year_range_val[1])
 
-altair_chart = (
-    alt.Chart(plot_df).mark_tick().encode(y="fuel_type_summary", x="barrels08")
-)
+# ---------- Display ----------
+if plot_df.empty:
+    st.warning(
+        "No data matches the current filters. "
+        "Try selecting at least one make or adjusting the year range."
+    )
+else:
+    avg_fuel_economy = plot_df["fuelCost08"].mean().round(0)
+    st.metric("Average Annual Fuel Cost", f"${avg_fuel_economy:,.0f}")
 
-# Display the output results
-st.write(fig)
-st.write(altair_chart)
+    fig = px.histogram(
+        plot_df,
+        x="fuelCost08",
+        color="class_summary",
+        labels={"fuelCost08": "Annual Fuel Cost"},
+        nbins=40,
+        title="Fuel Cost Distribution",
+    )
 
-st.write("Sample data", plot_df.head(10))
+    altair_chart = (
+        alt.Chart(plot_df).mark_tick().encode(y="fuel_type_summary", x="barrels08")
+    )
+
+    st.write(fig)
+    st.write(altair_chart)
+
+    with st.expander("Sample data"):
+        st.dataframe(plot_df.head(10), use_container_width=True)

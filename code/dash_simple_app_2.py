@@ -1,12 +1,18 @@
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import pandas as pd
 
 from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 
+from data_paths import epa_fuel_economy_summary
+
 app = Dash(__name__)
 
-src_file = Path.cwd() / "data" / "raw" / "EPA_fuel_economy_summary.csv"
+src_file = epa_fuel_economy_summary()
 df = pd.read_csv(src_file)
 fuel_types = df["fuel_type_summary"].unique()
 

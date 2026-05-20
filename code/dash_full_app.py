@@ -1,7 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
-from dash import Dash, html, dcc, Input, Output, dash_table
+from dash import Dash, html, dcc, Input, Output, State, dash_table, no_update
+from dash import callback_context as ctx
 import plotly.express as px
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
@@ -12,7 +13,6 @@ styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
 src_file = Path.cwd() / "data" / "raw" / "EPA_fuel_economy_summary.csv"
 df = pd.read_csv(src_file)
 
-# Define the input parameters
 min_year = df["year"].min()
 max_year = df["year"].max()
 all_years = df["year"].unique()
@@ -29,9 +29,6 @@ data_table_cols = [
     "displ",
     "fuelCost08",
 ]
-
-# Need to keep track of button clicks to see if there is a change
-total_clicks = 0
 
 app.layout = html.Div(
     [
@@ -73,9 +70,71 @@ app.layout = html.Div(
                 } for i in data_table_cols],
             ),
         ]),
+        dcc.Store(
+            id="selection-store",
+            data={
+                "selected_indices": None,
+                "year_range": None,
+                "transmissions": None,
+                "reset_clicks": 0,
+            },
+        ),
     ],
     style={"margin-bottom": "150px"},
 )
+
+
+@app.callback(
+    Output("selection-store", "data"),
+    Output("scatter-plot", "selectedData"),
+    Input("scatter-plot", "selectedData"),
+    Input("reset", "n_clicks"),
+    Input("year-slider", "value"),
+    Input("transmission-list", "value"),
+    State("selection-store", "data"),
+)
+def update_selection_store(selectedData, n_clicks, year_range, transmission_list, store):
+    trigger_ids = {c["prop_id"] for c in ctx.triggered}
+    store = store or {}
+
+    if "reset.n_clicks" in trigger_ids:
+        return {
+            "selected_indices": None,
+            "year_range": year_range,
+            "transmissions": transmission_list,
+            "reset_clicks": n_clicks or 0,
+        }, None
+
+    if "year-slider.value" in trigger_ids or "transmission-list.value" in trigger_ids:
+        return {
+            "selected_indices": None,
+            "year_range": year_range,
+            "transmissions": transmission_list,
+            "reset_clicks": store.get("reset_clicks", 0),
+        }, None
+
+    if "scatter-plot.selectedData" in trigger_ids:
+        if selectedData:
+            points = selectedData.get("points", [])
+            index_list = [
+                p["customdata"][0] for p in points
+                if p.get("customdata")
+            ]
+            return {
+                "selected_indices": index_list,
+                "year_range": year_range,
+                "transmissions": transmission_list,
+                "reset_clicks": store.get("reset_clicks", 0),
+            }, no_update
+        else:
+            return {
+                "selected_indices": None,
+                "year_range": year_range,
+                "transmissions": transmission_list,
+                "reset_clicks": store.get("reset_clicks", 0),
+            }, no_update
+
+    return store, no_update
 
 
 @app.callback(
@@ -85,15 +144,12 @@ app.layout = html.Div(
     Output("selected_count", "children"),
     Input("year-slider", "value"),
     Input("transmission-list", "value"),
-    Input("scatter-plot", "selectedData"),
-    Input("reset", "n_clicks"),
+    Input("selection-store", "data"),
 )
-def update_figure(year_range, transmission_list, selectedData, n_clicks):
-    # Global variables may cause unexepcted behavior in multi-user setup
-    global total_clicks
+def update_figure(year_range, transmission_list, store):
     filtered_df = df[df["year"].between(year_range[0], year_range[1])
                      & df["transmission"].isin(transmission_list)]
-    
+
     fig_hist = px.histogram(
         filtered_df,
         x="fuelCost08",
@@ -101,7 +157,7 @@ def update_figure(year_range, transmission_list, selectedData, n_clicks):
         labels={"fuelCost08": "Annual Fuel Cost"},
         nbins=40,
     )
-    
+
     fig_scatter = px.scatter(
         filtered_df,
         x="displ",
@@ -112,26 +168,32 @@ def update_figure(year_range, transmission_list, selectedData, n_clicks):
     fig_scatter.update_layout(clickmode="event", uirevision=True)
     fig_scatter.update_traces(selected_marker_color="red")
 
-    if n_clicks > total_clicks:
-        # From here - https://community.plotly.com/t/applying-only-newest-selectedpoints-in-multiple-graphs-or-clearing-selection/31881
-        fig_scatter.update_traces(selected_marker_color=None)
-        total_clicks = n_clicks
-        selectedData = None
-    
-    if selectedData:
-        points = selectedData["points"]
-        index_list = [
-            points[x]["customdata"][0] for x in range(0, len(points))
-        ]
-        filtered_df = df[df.index.isin(index_list)]
-        num_points_label = f"Showing {len(points)} selected points:"
-    else:
-        num_points_label = "No points selected - showing top 10 only"
-        filtered_df = filtered_df.head(10)
+    store = store or {}
+    store_year = store.get("year_range")
+    store_trans = store.get("transmissions")
+    selected_indices = store.get("selected_indices")
 
-    return fig_hist, fig_scatter, filtered_df.to_dict(
+    year_match = (store_year is not None
+                  and store_year[0] == year_range[0]
+                  and store_year[1] == year_range[1])
+    trans_match = (store_trans is not None
+                   and sorted(store_trans) == sorted(transmission_list))
+
+    if selected_indices and year_match and trans_match:
+        valid_indices = [i for i in selected_indices if i in filtered_df.index]
+        if valid_indices:
+            table_df = df.loc[valid_indices, data_table_cols]
+            num_points_label = f"Showing {len(valid_indices)} selected points:"
+        else:
+            table_df = filtered_df[data_table_cols].head(10)
+            num_points_label = "No points selected - showing top 10 only"
+    else:
+        table_df = filtered_df[data_table_cols].head(10)
+        num_points_label = "No points selected - showing top 10 only"
+
+    return fig_hist, fig_scatter, table_df.to_dict(
         "records"), num_points_label
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)  
+    app.run_server(debug=True)

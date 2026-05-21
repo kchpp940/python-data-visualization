@@ -1,0 +1,15 @@
+{
+  "mtime": 1779273626.0456495,
+  "row_count": 600,
+  "column_count": 7,
+  "missing_values": {
+    "Name": 0,
+    "Author": 0,
+    "User Rating": 0,
+    "Reviews": 0,
+    "Price": 0,
+    "Year": 0,
+    "Genre": 0
+  },
+  "sample_data": []
+}

@@ -1,0 +1,22 @@
+{
+  "mtime": 1779273626.0517814,
+  "row_count": 24210,
+  "column_count": 14,
+  "missing_values": {
+    "make": 0,
+    "model": 0,
+    "year": 0,
+    "cylinders": 231,
+    "trany": 9,
+    "displ": 230,
+    "VClass": 0,
+    "co2": 0,
+    "barrels08": 0,
+    "fuelCost08": 0,
+    "fuelType": 0,
+    "highway08": 0,
+    "city08": 0,
+    "comb08": 0
+  },
+  "sample_data": []
+}

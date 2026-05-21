@@ -13,7 +13,6 @@ from pin_manager import (  # noqa: E402
     build_comparison,
     remove_invalid,
 )
-from dataset_metadata import DATASETS, get_dataset_info  # noqa: E402
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -23,6 +22,7 @@ styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
 src_file = Path(__file__).resolve().parent / "data" / "raw" / "EPA_fuel_economy_summary.csv"
 df = pd.read_csv(src_file)
 
+# Define the input parameters
 min_year = int(df["year"].min())
 max_year = int(df["year"].max())
 all_years = sorted(df["year"].unique())
@@ -40,109 +40,12 @@ data_table_cols = [
     "fuelCost08",
 ]
 
+# Need to keep track of button clicks to see if there is a change
 total_clicks = 0
-
-
-def build_dataset_info_layout():
-    """Build the dataset information tab layout."""
-    dataset_options = [
-        {"label": meta.name, "value": key} for key, meta in DATASETS.items()
-    ]
-
-    return html.Div(
-        [
-            html.H2("📊 数据集信息"),
-            html.Div(
-                [
-                    html.P("选择数据集查看详细信息："),
-                    dcc.Dropdown(
-                        id="dataset-selector",
-                        options=dataset_options,
-                        value=list(DATASETS.keys())[0],
-                        clearable=False,
-                    ),
-                ],
-                style={"margin-bottom": "20px"},
-            ),
-            html.Div(
-                [
-                    html.Div(id="dataset-basic-info"),
-                    html.Hr(),
-                    html.H4("字段说明"),
-                    dash_table.DataTable(
-                        id="dataset-fields-table",
-                        columns=[
-                            {"name": "字段名", "id": "name"},
-                            {"name": "类型", "id": "dtype"},
-                            {"name": "说明", "id": "description"},
-                            {"name": "缺失值", "id": "missing"},
-                        ],
-                        data=[],
-                        style_cell={
-                            "textAlign": "left",
-                            "padding": "8px",
-                            "whiteSpace": "normal",
-                            "height": "auto",
-                        },
-                        style_header={"fontWeight": "bold", "backgroundColor": "#f5f5f5"},
-                        style_data_conditional=[
-                            {
-                                "if": {"column_id": "missing", "filter_query": '{missing} > "0"'},
-                                "color": "red",
-                                "fontWeight": "bold",
-                            }
-                        ],
-                    ),
-                    html.Hr(),
-                    html.H4("章节使用示例"),
-                    dash_table.DataTable(
-                        id="dataset-chapters-table",
-                        columns=[
-                            {"name": "章节", "id": "chapter"},
-                            {"name": "练习", "id": "exercises"},
-                            {"name": "用途", "id": "purpose"},
-                            {"name": "关键字段", "id": "key_fields"},
-                        ],
-                        data=[],
-                        style_cell={
-                            "textAlign": "left",
-                            "padding": "8px",
-                            "whiteSpace": "normal",
-                            "height": "auto",
-                        },
-                        style_header={"fontWeight": "bold", "backgroundColor": "#f5f5f5"},
-                    ),
-                    html.Hr(),
-                    html.H4("备注"),
-                    html.Div(id="dataset-notes"),
-                ],
-                style={"maxWidth": "900px"},
-            ),
-        ],
-        style={"padding": "20px"},
-    )
-
 
 app.layout = html.Div(
     [
-        html.H1("Python 数据可视化课程示例"),
-        dcc.Tabs(
-            id="app-tabs",
-            value="fuel-analysis",
-            children=[
-                dcc.Tab(label="🚗 燃油成本分析", value="fuel-analysis"),
-                dcc.Tab(label="📊 数据集信息", value="dataset-info"),
-            ],
-        ),
-        html.Div(id="tabs-content"),
-    ],
-    style={"margin-bottom": "150px"},
-)
-
-
-fuel_analysis_layout = html.Div(
-    [
-        html.H2("Fuel Cost Analysis"),
+        html.H1("Fuel Cost Analysis"),
         dcc.Store(id="pinned-vehicles", data=[]),
         dcc.Store(id="last-reset-click", data=0),
         html.Div(
@@ -239,86 +142,13 @@ fuel_analysis_layout = html.Div(
             ],
         ),
     ],
-    style={"padding": "20px"},
+    style={"margin-bottom": "150px"},
 )
 
 
-@app.callback(Output("tabs-content", "children"), Input("app-tabs", "value"))
-def render_tab(tab_value):
-    if tab_value == "fuel-analysis":
-        return fuel_analysis_layout
-    elif tab_value == "dataset-info":
-        return build_dataset_info_layout()
-    return html.Div()
-
-
-@app.callback(
-    Output("dataset-basic-info", "children"),
-    Output("dataset-fields-table", "data"),
-    Output("dataset-chapters-table", "data"),
-    Output("dataset-notes", "children"),
-    Input("dataset-selector", "value"),
-)
-def update_dataset_info(dataset_key):
-    _, info = get_dataset_info(dataset_key, load_data=False)
-
-    basic_info = html.Div(
-        [
-            html.H3(info.name),
-            html.P(info.static.description),
-            html.Div(
-                [
-                    html.Strong("文件名："),
-                    html.Span(f"{info.filename} ({info.static.file_type})"),
-                    html.Br(),
-                    html.Strong("行数："),
-                    html.Span(f"{info.row_count:,}"),
-                    html.Br(),
-                    html.Strong("列数："),
-                    html.Span(f"{info.column_count}"),
-                    html.Br(),
-                    html.Strong("缺失值："),
-                    html.Span(
-                        f"{info.total_missing:,} ({info.missing_pct:.2f}%)",
-                        style={"color": "red" if info.total_missing > 0 else "inherit"},
-                    ),
-                ],
-                style={
-                    "backgroundColor": "#f9f9f9",
-                    "padding": "15px",
-                    "borderRadius": "5px",
-                },
-            ),
-        ]
-    )
-
-    fields_data = [
-        {
-            "name": f.name,
-            "dtype": f.dtype,
-            "description": f.description,
-            "missing": str(info.missing_values.get(f.name, 0)),
-        }
-        for f in info.fields
-    ]
-
-    chapters_data = [
-        {
-            "chapter": f"第 {ch.chapter} 章",
-            "exercises": ", ".join(str(e) for e in ch.exercises),
-            "purpose": ch.purpose,
-            "key_fields": ", ".join(ch.key_fields),
-        }
-        for ch in info.chapters
-    ]
-
-    if info.notes:
-        notes = html.Ul([html.Li(note) for note in info.notes])
-    else:
-        notes = html.P("无备注")
-
-    return basic_info, fields_data, chapters_data, notes
-
+# ---------------------------------------------------------------------------
+# 回调 1：记录 Reset 点击
+# ---------------------------------------------------------------------------
 
 @app.callback(
     Output("last-reset-click", "data"),
@@ -328,6 +158,10 @@ def update_dataset_info(dataset_key):
 def record_reset(n_clicks):
     return n_clicks if n_clicks is not None else 0
 
+
+# ---------------------------------------------------------------------------
+# 回调 2：图表 + 数据表
+# ---------------------------------------------------------------------------
 
 @app.callback(
     Output("histogram-with-slider", "figure"),
@@ -378,11 +212,24 @@ def update_figure(year_range, transmission_list, selectedData, last_reset):
         num_points_label = "No points selected - showing top 10 only"
         table_df = filtered_df.head(10)
 
+    # pin_id 列用于从表格反查原始行索引（DataFrame 的原始 index）
     table_records = (
         table_df.reset_index().rename(columns={"index": "pin_id"}).to_dict("records")
     )
     return fig_hist, fig_scatter, table_records, num_points_label
 
+
+# ---------------------------------------------------------------------------
+# 回调 3：同步 pinned-vehicles Store（唯一写入方）
+#
+# 触发源：
+#   - 筛选器变化（year-slider / transmission-list）：仅做失效清理
+#   - Pin 按钮：先追加 pin_id，再做失效清理
+#   - Clear 按钮：清空
+#
+# pin_id 即原始 DataFrame 的行索引，作为记录的唯一身份，
+# 保证同一款车型的不同 trim 也能被独立固定。
+# ---------------------------------------------------------------------------
 
 @app.callback(
     Output("pinned-vehicles", "data"),
@@ -436,9 +283,14 @@ def sync_pinned_store(
                     new_pin_ids.append(int(pid))
             pinned = add_pins(df, pinned, new_pin_ids, year_range, transmission_list)
 
+    # 统一按当前筛选条件失效清理，确保 Store 与页面显示一致
     pinned, _ = remove_invalid(df, pinned, year_range, transmission_list)
     return pinned
 
+
+# ---------------------------------------------------------------------------
+# 回调 4：渲染对比表
+# ---------------------------------------------------------------------------
 
 @app.callback(
     Output("comparison-table", "data"),

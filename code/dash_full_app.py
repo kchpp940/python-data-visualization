@@ -1,15 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
-from dash import Dash, html, dcc, Input, Output, State, dash_table, callback_context
+from dash import Dash, html, dcc, Input, Output, dash_table
 import plotly.express as px
-
-from dash_selection_state import (
-    build_default_state,
-    filter_dataframe,
-    resolve_selection_render,
-    resolve_selection_update,
-)
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -19,6 +12,7 @@ styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
 src_file = Path.cwd() / "data" / "raw" / "EPA_fuel_economy_summary.csv"
 df = pd.read_csv(src_file)
 
+# Define the input parameters
 min_year = df["year"].min()
 max_year = df["year"].max()
 all_years = df["year"].unique()
@@ -36,7 +30,8 @@ data_table_cols = [
     "fuelCost08",
 ]
 
-default_state = build_default_state(min_year, max_year, transmission_types)
+# Need to keep track of button clicks to see if there is a change
+total_clicks = 0
 
 app.layout = html.Div(
     [
@@ -78,26 +73,9 @@ app.layout = html.Div(
                 } for i in data_table_cols],
             ),
         ]),
-        dcc.Store(id="selection_state", data=default_state),
     ],
     style={"margin-bottom": "150px"},
 )
-
-
-@app.callback(
-    Output("selection_state", "data"),
-    Output("scatter-plot", "selectedData"),
-    Input("year-slider", "value"),
-    Input("transmission-list", "value"),
-    Input("reset", "n_clicks"),
-    Input("scatter-plot", "selectedData"),
-    State("selection_state", "data"),
-)
-def update_selection_state(year_range, transmission_list, n_clicks, selectedData, state):
-    triggered = {t["prop_id"] for t in callback_context.triggered}
-    return resolve_selection_update(
-        df, triggered, year_range, transmission_list, selectedData, state
-    )
 
 
 @app.callback(
@@ -107,11 +85,15 @@ def update_selection_state(year_range, transmission_list, n_clicks, selectedData
     Output("selected_count", "children"),
     Input("year-slider", "value"),
     Input("transmission-list", "value"),
-    Input("selection_state", "data"),
+    Input("scatter-plot", "selectedData"),
+    Input("reset", "n_clicks"),
 )
-def update_figure(year_range, transmission_list, state):
-    filtered_df = filter_dataframe(df, year_range, transmission_list)
-
+def update_figure(year_range, transmission_list, selectedData, n_clicks):
+    # Global variables may cause unexepcted behavior in multi-user setup
+    global total_clicks
+    filtered_df = df[df["year"].between(year_range[0], year_range[1])
+                     & df["transmission"].isin(transmission_list)]
+    
     fig_hist = px.histogram(
         filtered_df,
         x="fuelCost08",
@@ -119,25 +101,37 @@ def update_figure(year_range, transmission_list, state):
         labels={"fuelCost08": "Annual Fuel Cost"},
         nbins=40,
     )
-
+    
     fig_scatter = px.scatter(
         filtered_df,
         x="displ",
         y="fuelCost08",
         hover_data=[filtered_df.index, "make", "model", "year"],
     )
+
     fig_scatter.update_layout(clickmode="event", uirevision=True)
     fig_scatter.update_traces(selected_marker_color="red")
 
-    table_df, selected_point_indices, label = resolve_selection_render(
-        df, year_range, transmission_list, state
-    )
+    if n_clicks > total_clicks:
+        # From here - https://community.plotly.com/t/applying-only-newest-selectedpoints-in-multiple-graphs-or-clearing-selection/31881
+        fig_scatter.update_traces(selected_marker_color=None)
+        total_clicks = n_clicks
+        selectedData = None
+    
+    if selectedData:
+        points = selectedData["points"]
+        index_list = [
+            points[x]["customdata"][0] for x in range(0, len(points))
+        ]
+        filtered_df = df[df.index.isin(index_list)]
+        num_points_label = f"Showing {len(points)} selected points:"
+    else:
+        num_points_label = "No points selected - showing top 10 only"
+        filtered_df = filtered_df.head(10)
 
-    if selected_point_indices:
-        fig_scatter.update_traces(selectedpoints=selected_point_indices)
-
-    return fig_hist, fig_scatter, table_df.to_dict("records"), label
+    return fig_hist, fig_scatter, filtered_df.to_dict(
+        "records"), num_points_label
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True)  

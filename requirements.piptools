@@ -3,31 +3,35 @@
 # You don't need to use this file or modify it, just install the dependencies for requirements.txt
 # But you can learn more here: https://pip-tools.readthedocs.io/en/latest/
 #
+# Version upper bounds protect the original course example code from major-version
+# breaking changes. Only the bounds below are explicitly pinned; everything else
+# resolves naturally. Re-generate requirements.txt with:
+#    pip-compile requirements.piptools
 
-# Chapter 3 dependencies
-jupyter
-jupyterlab
-pandas
-numpy
-matplotlib
-statsmodels
+# --- Core data processing ---
+pandas<3
+numpy<2
 
-# Chapter 4 dependencies
-# no additional libs
+# --- Matplotlib & stats (Ch 3–4 notebooks) ---
+matplotlib<3.9
+statsmodels<0.15
 
-# Chapter 5 dependencies
-seaborn
+# --- Seaborn (Ch 5 notebooks) ---
+seaborn<0.14
 
-# Chapter 6 dependencies
-altair
-altair_data_server
-altair_saver
-openpyxl
-vegafusion
-vegafusion-python-embed
-vl-convert-python
+# --- Altair + data transformers (Ch 6 notebooks & Streamlit) ---
+altair<6
+vegafusion<2
+vegafusion-python-embed<2
 
+# --- Excel reading (Ch 6 notebook: pd.read_excel) ---
+openpyxl<3.2
 
-# Chapter 7 dependencies
-plotly
-kaleido
+# --- Plotly (Ch 7 notebooks & Dash/Streamlit) ---
+plotly<6
+
+# --- Dash web apps (Ch 7 scripts) ---
+dash
+
+# --- Streamlit web apps (Ch 7 scripts) ---
+streamlit

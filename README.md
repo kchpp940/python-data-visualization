@@ -38,3 +38,69 @@ Developers and Data Analysts that have some experience with python but have not 
 ## Take the course
 
 Data sciense is one of the hottest topic of the year and data visualization is a core skillset needed to properly communicate your results and discoveries. **Take this course** to get good at a wide variety of modern Python-based visualization libraries.
+
+---
+
+## 快速开始
+
+### 一键运行示例
+
+项目提供统一启动入口 `launcher.py`，自动检查依赖并启动各类示例：
+
+```bash
+# 1. 安装依赖
+pip install -r requirements.txt
+
+# 2. 查看所有可用示例
+python launcher.py list
+
+# 3. 交互式选择（推荐）
+python launcher.py
+
+# 4. 或直接启动指定示例
+python launcher.py run dash-full   # 启动完整 Dash 应用
+python launcher.py run st-1        # 启动 Streamlit 示例
+python launcher.py run nb-ch5      # 打开 Notebook
+```
+
+### 环境检查
+
+启动前可单独执行环境检查，明确区分三类问题：
+
+```bash
+# 检查所有示例的环境就绪状态
+python launcher.py check
+
+# 检查指定示例
+python launcher.py check dash-1
+```
+
+检查结果会按 **缺依赖 / 缺数据文件 / 缺入口脚本** 三类分别列出，并给出对应解决方法。
+
+### 示例清单维护
+
+所有示例注册在 `examples_manifest.json`，**新增示例无需修改 launcher.py**，只需在此文件追加一条记录：
+
+```json
+"your-example-id": {
+  "type": "dash | streamlit | notebook",
+  "file": "script_file.py",
+  "title": "简短标题",
+  "desc": "一句话描述",
+  "data_files": ["data_file.csv"],
+  "deps": ["pandas", "plotly"]
+}
+```
+
+字段说明：
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `type` | ✅ | `dash` / `streamlit` / `notebook`，决定启动命令 |
+| `file` | ✅ | 脚本文件名，相对于 `code/` 目录 |
+| `title` | ✅ | 显示在列表中的简短名称 |
+| `desc` | ✅ | 补充说明 |
+| `data_files` | ✅ | 依赖的数据文件名（空数组为无依赖），相对于 `code/data/raw/` |
+| `deps` | ✅ | 需要检查的 Python 包列表（空数组为无依赖） |
+
+示例 ID 命名约定：`dash-*` / `st-*` / `nb-chX-Y`（第X章第Y题）。

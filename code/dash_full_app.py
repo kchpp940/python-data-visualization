@@ -1,154 +1,62 @@
+"""Dash 完整应用：EPA Fuel Economy 分析 + 车型对比面板。
+
+本文件仅作为"组装层"：
+
+- 数据加载 / 常量  →  本文件顶部
+- 页面 UI 组件   →  ``src.dash_layout``
+- 筛选 + 选中解析 + 图表构建   →  ``src.dash_state``
+- pin 去重 / 失效清理 / 对比表  →  ``src.pin_manager``
+
+回调函数只做"把事件翻译为状态操作"这一件事，不再承担具体业务判断。
+
+所有跨请求状态均托管于 ``dcc.Store``，不依赖模块级可变变量，
+保证多会话场景下互不污染。
+"""
+
 from pathlib import Path
 import sys
 
 import pandas as pd
 
-from dash import Dash, html, dcc, Input, Output, State, dash_table, no_update
-import plotly.express as px
+from dash import Dash, Input, Output, State, dash, no_update
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from dash_layout import (  # noqa: E402
+    DEFAULT_COLUMNS,
+    build_full_layout,
+)
+from dash_state import (  # noqa: E402
+    build_main_view,
+    sync_pinned,
+)
 from pin_manager import (  # noqa: E402
-    add_pins,
     build_comparison,
-    remove_invalid,
 )
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
-styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
-
 src_file = Path(__file__).resolve().parent / "data" / "raw" / "EPA_fuel_economy_summary.csv"
 df = pd.read_csv(src_file)
 
-# Define the input parameters
 min_year = int(df["year"].min())
 max_year = int(df["year"].max())
 all_years = sorted(df["year"].unique())
 transmission_types = df["transmission"].unique()
 
-data_table_cols = [
-    "make",
-    "model",
-    "year",
-    "transmission",
-    "drive",
-    "class_summary",
-    "cylinders",
-    "displ",
-    "fuelCost08",
-]
-
-# Need to keep track of button clicks to see if there is a change
-total_clicks = 0
-
-app.layout = html.Div(
-    [
-        html.H1("Fuel Cost Analysis"),
-        dcc.Store(id="pinned-vehicles", data=[]),
-        dcc.Store(id="last-reset-click", data=0),
-        html.Div(
-            [
-                html.Div(
-                    [
-                        html.P("Talk Python Training Example"),
-                        dcc.Graph(
-                            id="histogram-with-slider",
-                            config={"displayModeBar": False},
-                        ),
-                        dcc.Graph(id="scatter-plot"),
-                        html.Label("Year Range"),
-                        dcc.RangeSlider(
-                            id="year-slider",
-                            min=min_year,
-                            max=max_year,
-                            value=(min_year, max_year),
-                            marks={str(y): str(y) for y in all_years},
-                        ),
-                        html.Label("Transmission type"),
-                        dcc.Checklist(
-                            id="transmission-list",
-                            options=[{"label": i, "value": i} for i in transmission_types],
-                            value=list(transmission_types),
-                            labelStyle={"display": "inline-block"},
-                        ),
-                        html.Hr(),
-                        html.Div(
-                            [
-                                html.Button(
-                                    "Reset selections",
-                                    id="reset",
-                                    n_clicks=0,
-                                    style={"margin-right": "10px"},
-                                ),
-                                html.Button(
-                                    "Pin selected scatter points",
-                                    id="pin-from-scatter",
-                                    n_clicks=0,
-                                    style={"margin-right": "10px"},
-                                ),
-                                html.Button(
-                                    "Pin selected table rows",
-                                    id="pin-from-table",
-                                    n_clicks=0,
-                                ),
-                            ]
-                        ),
-                        html.H3(id="selected_count"),
-                        dash_table.DataTable(
-                            id="data-table",
-                            data=[],
-                            page_size=10,
-                            row_selectable="multi",
-                            selected_rows=[],
-                            columns=[{"name": i, "id": i} for i in data_table_cols],
-                        ),
-                    ],
-                    style={"width": "60%", "display": "inline-block", "vertical-align": "top"},
-                ),
-                html.Div(
-                    [
-                        html.H3("车型对比面板"),
-                        html.Div(
-                            "从散点图或表格中选中车型，点击“Pin”按钮加入对比。",
-                            style={"font-size": "12px", "color": "#666", "margin-bottom": "10px"},
-                        ),
-                        html.Button(
-                            "Clear all pinned",
-                            id="clear-pinned",
-                            n_clicks=0,
-                            style={"margin-bottom": "10px"},
-                        ),
-                        html.Div(
-                            id="comparison-message",
-                            style={"font-size": "12px", "color": "#888", "margin-bottom": "8px"},
-                        ),
-                        dash_table.DataTable(
-                            id="comparison-table",
-                            data=[],
-                            columns=[],
-                            style_cell={"padding": "6px 10px", "textAlign": "center"},
-                            style_header={"fontWeight": "bold"},
-                        ),
-                    ],
-                    style={
-                        "width": "38%",
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "2%",
-                    },
-                ),
-            ],
-        ),
-    ],
-    style={"margin-bottom": "150px"},
+app.layout = build_full_layout(
+    all_years=all_years,
+    transmission_types=transmission_types,
+    min_year=min_year,
+    max_year=max_year,
 )
 
 
 # ---------------------------------------------------------------------------
 # 回调 1：记录 Reset 点击
 # ---------------------------------------------------------------------------
+
 
 @app.callback(
     Output("last-reset-click", "data"),
@@ -161,75 +69,37 @@ def record_reset(n_clicks):
 
 # ---------------------------------------------------------------------------
 # 回调 2：图表 + 数据表
+#
+# 所有 reset 判断 / 图表构建 / 表格源选择均下沉到 build_main_view，
+# 本回调只做参数传递和结果分发。
 # ---------------------------------------------------------------------------
+
 
 @app.callback(
     Output("histogram-with-slider", "figure"),
     Output("scatter-plot", "figure"),
     Output("data-table", "data"),
     Output("selected_count", "children"),
+    Output("reset-baseline", "data"),
     Input("year-slider", "value"),
     Input("transmission-list", "value"),
     Input("scatter-plot", "selectedData"),
     Input("last-reset-click", "data"),
+    State("reset-baseline", "data"),
 )
-def update_figure(year_range, transmission_list, selectedData, last_reset):
-    global total_clicks
-    filtered_df = df[
-        df["year"].between(year_range[0], year_range[1])
-        & df["transmission"].isin(transmission_list)
-    ]
-
-    fig_hist = px.histogram(
-        filtered_df,
-        x="fuelCost08",
-        color="class_summary",
-        labels={"fuelCost08": "Annual Fuel Cost"},
-        nbins=40,
+def update_figure(year_range, transmission_list, selected_data, last_reset, baseline):
+    return build_main_view(
+        df, year_range, transmission_list, selected_data, last_reset, baseline
     )
-
-    fig_scatter = px.scatter(
-        filtered_df,
-        x="displ",
-        y="fuelCost08",
-        hover_data=[filtered_df.index, "make", "model", "year"],
-    )
-
-    fig_scatter.update_layout(clickmode="event", uirevision=True)
-    fig_scatter.update_traces(selected_marker_color="red")
-
-    if last_reset is not None and last_reset > total_clicks:
-        fig_scatter.update_traces(selected_marker_color=None)
-        total_clicks = last_reset
-        selectedData = None
-
-    if selectedData:
-        points = selectedData["points"]
-        index_list = [points[x]["customdata"][0] for x in range(len(points))]
-        table_df = df[df.index.isin(index_list)]
-        num_points_label = f"Showing {len(points)} selected points:"
-    else:
-        num_points_label = "No points selected - showing top 10 only"
-        table_df = filtered_df.head(10)
-
-    # pin_id 列用于从表格反查原始行索引（DataFrame 的原始 index）
-    table_records = (
-        table_df.reset_index().rename(columns={"index": "pin_id"}).to_dict("records")
-    )
-    return fig_hist, fig_scatter, table_records, num_points_label
 
 
 # ---------------------------------------------------------------------------
 # 回调 3：同步 pinned-vehicles Store（唯一写入方）
 #
-# 触发源：
-#   - 筛选器变化（year-slider / transmission-list）：仅做失效清理
-#   - Pin 按钮：先追加 pin_id，再做失效清理
-#   - Clear 按钮：清空
-#
-# pin_id 即原始 DataFrame 的行索引，作为记录的唯一身份，
-# 保证同一款车型的不同 trim 也能被独立固定。
+# 所有触发源解析 / pin_id 提取 / 失效清理均下沉到 sync_pinned，
+# 本回调只做参数传递和 no_update 判断。
 # ---------------------------------------------------------------------------
+
 
 @app.callback(
     Output("pinned-vehicles", "data"),
@@ -249,48 +119,30 @@ def sync_pinned_store(
     clear_n,
     year_range,
     transmission_list,
-    selectedData,
+    selected_data,
     selected_rows,
     table_data,
     pinned,
 ):
-    ctx = dash.callback_context
+    del pin_scatter_n, pin_table_n, clear_n
 
+    ctx = dash.callback_context
     if not ctx.triggered:
         return no_update
 
     triggered = [t["prop_id"].split(".")[0] for t in ctx.triggered]
 
-    if "clear-pinned" in triggered:
-        return []
-
-    pinned = list(pinned or [])
-
-    for source in triggered:
-        if source == "pin-from-scatter" and selectedData:
-            new_pin_ids = []
-            for pt in selectedData["points"]:
-                pid = pt["customdata"][0]
-                if 0 <= pid < len(df):
-                    new_pin_ids.append(int(pid))
-            pinned = add_pins(df, pinned, new_pin_ids, year_range, transmission_list)
-
-        elif source == "pin-from-table" and selected_rows:
-            new_pin_ids = []
-            for i in selected_rows:
-                if i < len(table_data):
-                    pid = table_data[i]["pin_id"]
-                    new_pin_ids.append(int(pid))
-            pinned = add_pins(df, pinned, new_pin_ids, year_range, transmission_list)
-
-    # 统一按当前筛选条件失效清理，确保 Store 与页面显示一致
-    pinned, _ = remove_invalid(df, pinned, year_range, transmission_list)
-    return pinned
+    result = sync_pinned(
+        df, triggered, selected_data, selected_rows, table_data, pinned,
+        year_range, transmission_list,
+    )
+    return result if result is not None else no_update
 
 
 # ---------------------------------------------------------------------------
 # 回调 4：渲染对比表
 # ---------------------------------------------------------------------------
+
 
 @app.callback(
     Output("comparison-table", "data"),
@@ -301,8 +153,11 @@ def sync_pinned_store(
     Input("transmission-list", "value"),
 )
 def render_comparison(pinned, year_range, transmission_list):
-    data, columns, msg = build_comparison(df, pinned, year_range, transmission_list)
-    return data, columns, msg
+    return build_comparison(df, pinned, year_range, transmission_list)
+
+
+# 使 DEFAULT_COLUMNS 在外部也可引用（保持与旧版一致）
+data_table_cols = DEFAULT_COLUMNS
 
 
 if __name__ == "__main__":

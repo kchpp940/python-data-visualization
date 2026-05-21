@@ -8,30 +8,31 @@
 # resolves naturally. Re-generate requirements.txt with:
 #    pip-compile requirements.piptools
 
-# --- Core data processing ---
+# Chapter 3 dependencies
+jupyter<1.1
+jupyterlab<4.1
 pandas<3
 numpy<2
-
-# --- Matplotlib & stats (Ch 3–4 notebooks) ---
 matplotlib<3.9
 statsmodels<0.15
 
-# --- Seaborn (Ch 5 notebooks) ---
+# Chapter 4 dependencies
+# no additional libs
+
+# Chapter 5 dependencies
 seaborn<0.14
 
-# --- Altair + data transformers (Ch 6 notebooks & Streamlit) ---
+# Chapter 6 dependencies
 altair<6
+altair_data_server
+altair_saver
+openpyxl<3.2
 vegafusion<2
 vegafusion-python-embed<2
+vl-convert-python<1.3
 
-# --- Excel reading (Ch 6 notebook: pd.read_excel) ---
-openpyxl<3.2
-
-# --- Plotly (Ch 7 notebooks & Dash/Streamlit) ---
+# Chapter 7 dependencies
 plotly<6
-
-# --- Dash web apps (Ch 7 scripts) ---
+kaleido<1
 dash
-
-# --- Streamlit web apps (Ch 7 scripts) ---
 streamlit

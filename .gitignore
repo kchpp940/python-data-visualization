@@ -140,3 +140,6 @@ seaborn_heatmap.svg
 histogram.svg
 customization_example.svg
 plotlyhistogram.svg
+
+# Dataset metadata profile cache
+.metadata_cache/

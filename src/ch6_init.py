@@ -30,6 +30,25 @@ import pandas as pd
 
 from data_paths import RAW_DATA_DIR, IMAGES_DIR, REPO_ROOT  # noqa: E402
 
+from src.dataset_metadata import (  # noqa: E402
+    DATASETS,
+    DatasetStatic,
+    DatasetProfile,
+    DatasetInfo,
+    README_START_MARKER,
+    README_END_MARKER,
+    list_datasets,
+    get_dataset_metadata,
+    get_dataset_profile,
+    get_dataset_info,
+    print_dataset_summary,
+    get_chapter_datasets,
+    generate_readme_section,
+    update_readme,
+    invalidate_cache,
+    notebook_init,
+)
+
 import altair as alt  # noqa: E402
 
 DEFAULT_LARGE_DATA_THRESHOLD: int = 200_000
@@ -251,4 +270,20 @@ __all__ = [
     "init_chapter6",
     "read_excel_safe",
     "save_altair_chart",
+    "DATASETS",
+    "DatasetStatic",
+    "DatasetProfile",
+    "DatasetInfo",
+    "README_START_MARKER",
+    "README_END_MARKER",
+    "list_datasets",
+    "get_dataset_metadata",
+    "get_dataset_profile",
+    "get_dataset_info",
+    "print_dataset_summary",
+    "get_chapter_datasets",
+    "generate_readme_section",
+    "update_readme",
+    "invalidate_cache",
+    "notebook_init",
 ]

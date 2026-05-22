@@ -1,0 +1,36 @@
+{
+  "dash": {
+    "command": "{python}",
+    "args_template": ["{file}"],
+    "cwd": "code",
+    "check_package": "dash",
+    "fallbacks": []
+  },
+  "streamlit": {
+    "command": "{python}",
+    "args_template": ["-m", "streamlit", "run", "{file}"],
+    "cwd": "code",
+    "check_package": "streamlit",
+    "fallbacks": []
+  },
+  "notebook": {
+    "command": "{python}",
+    "args_template": ["-m", "jupyter", "lab", "{file}"],
+    "cwd": "code",
+    "check_package": "jupyterlab",
+    "fallbacks": [
+      {
+        "command": "{python}",
+        "args_template": ["-m", "notebook", "{file}"],
+        "check_package": "notebook"
+      }
+    ]
+  },
+  "script": {
+    "command": "{python}",
+    "args_template": ["{file}"],
+    "cwd": "code",
+    "check_package": null,
+    "fallbacks": []
+  }
+}

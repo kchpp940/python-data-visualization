@@ -1,0 +1,186 @@
+{
+  "dash-1": {
+    "type": "dash",
+    "file": "dash_simple_app_1.py",
+    "title": "Simple Dash App 1",
+    "desc": "Basic histogram with Plotly Express",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+  "dash-2": {
+    "type": "dash",
+    "file": "dash_simple_app_2.py",
+    "title": "Simple Dash App 2",
+    "desc": "Interactive histogram with fuel type dropdown",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+  "dash-full": {
+    "type": "dash",
+    "file": "dash_full_app.py",
+    "title": "Full Dash App",
+    "desc": "Complete vehicle comparison dashboard with pinning",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+  "dash-html-gen": {
+    "type": "script",
+    "file": "dash_html_gen.py",
+    "title": "Dash HTML Generator",
+    "desc": "Static HTML export from Dash layout",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+  "st-1": {
+    "type": "streamlit",
+    "file": "st_simple_1.py",
+    "title": "Streamlit Simple 1",
+    "desc": "Basic Streamlit histogram",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly"]
+  },
+  "st-2": {
+    "type": "streamlit",
+    "file": "st_simple_2.py",
+    "title": "Streamlit Simple 2",
+    "desc": "Streamlit with Altair chart and caching",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly", "altair"]
+  },
+  "st-sidebar": {
+    "type": "streamlit",
+    "file": "st_simple_sidebar.py",
+    "title": "Streamlit Sidebar",
+    "desc": "Streamlit with sidebar controls and Altair",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly", "altair"]
+  },
+  "nb-ch3-1": {
+    "type": "notebook",
+    "file": "ch3-exercise-1.ipynb",
+    "title": "Ch3 Exercise 1",
+    "desc": "Matplotlib basics",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+  "nb-ch3-2": {
+    "type": "notebook",
+    "file": "ch3-exercise-2.ipynb",
+    "title": "Ch3 Exercise 2",
+    "desc": "Matplotlib customization",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+  "nb-ch3-3": {
+    "type": "notebook",
+    "file": "ch3-exercise-3.ipynb",
+    "title": "Ch3 Exercise 3",
+    "desc": "Matplotlib subplots",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+  "nb-ch4-1": {
+    "type": "notebook",
+    "file": "ch4-exercise-1.ipynb",
+    "title": "Ch4 Exercise 1",
+    "desc": "Pandas plotting basics",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+  "nb-ch4-2": {
+    "type": "notebook",
+    "file": "ch4-exercise-2.ipynb",
+    "title": "Ch4 Exercise 2",
+    "desc": "Pandas plotting advanced",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+  "nb-ch5-1": {
+    "type": "notebook",
+    "file": "ch5-exercise-1.ipynb",
+    "title": "Ch5 Exercise 1",
+    "desc": "Seaborn basics",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+  "nb-ch5-2": {
+    "type": "notebook",
+    "file": "ch5-exercise-2.ipynb",
+    "title": "Ch5 Exercise 2",
+    "desc": "Seaborn categorical plots",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+  "nb-ch5-3": {
+    "type": "notebook",
+    "file": "ch5-exercise-3.ipynb",
+    "title": "Ch5 Exercise 3",
+    "desc": "Seaborn grids",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+  "nb-ch5-4": {
+    "type": "notebook",
+    "file": "ch5-exercise-4.ipynb",
+    "title": "Ch5 Exercise 4",
+    "desc": "Seaborn advanced",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+  "nb-ch6-1": {
+    "type": "notebook",
+    "file": "ch6-exercise-1.ipynb",
+    "title": "Ch6 Exercise 1",
+    "desc": "Altair basics",
+    "data_files": ["EPA_fuel_economy.csv", "AmazonBooks.xlsx"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl"]
+  },
+  "nb-ch6-2": {
+    "type": "notebook",
+    "file": "ch6-exercise-2.ipynb",
+    "title": "Ch6 Exercise 2",
+    "desc": "Altair interactivity",
+    "data_files": ["EPA_fuel_economy.csv", "AmazonBooks.xlsx"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl"]
+  },
+  "nb-ch6-3": {
+    "type": "notebook",
+    "file": "ch6-exercise-3.ipynb",
+    "title": "Ch6 Exercise 3",
+    "desc": "Altair compound charts",
+    "data_files": ["EPA_fuel_economy.csv", "AmazonBooks.xlsx"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl"]
+  },
+  "nb-ch7-1": {
+    "type": "notebook",
+    "file": "ch7-exercise-1.ipynb",
+    "title": "Ch7 Exercise 1",
+    "desc": "Plotly basics",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly"]
+  },
+  "nb-ch7-2": {
+    "type": "notebook",
+    "file": "ch7-exercise-2.ipynb",
+    "title": "Ch7 Exercise 2",
+    "desc": "Plotly interactivity",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly"]
+  },
+  "nb-ch7-3": {
+    "type": "notebook",
+    "file": "ch7-exercise-3.ipynb",
+    "title": "Ch7 Exercise 3",
+    "desc": "Plotly subplots",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly"]
+  },
+  "nb-ch7-4": {
+    "type": "notebook",
+    "file": "ch7-exercise-4.ipynb",
+    "title": "Ch7 Exercise 4",
+    "desc": "Plotly advanced",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly"]
+  }
+}

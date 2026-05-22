@@ -3,7 +3,8 @@
     "command": "{python}",
     "args_template": ["{file}"],
     "cwd": "code",
-    "check_package": null
+    "check_package": "dash",
+    "fallbacks": []
   },
   "streamlit": {
     "command": "{python}",
@@ -18,18 +19,14 @@
     "cwd": "code",
     "check_package": "jupyterlab",
     "fallbacks": [
-      {
-        "command": "{python}",
-        "args_template": ["-m", "notebook", "{file}"],
-        "cwd": "code",
-        "check_package": "notebook"
-      }
+      {"args_template": ["-m", "notebook", "{file}"], "check_package": "notebook"}
     ]
   },
   "script": {
     "command": "{python}",
     "args_template": ["{file}"],
     "cwd": "code",
-    "check_package": null
+    "check_package": "",
+    "fallbacks": []
   }
 }

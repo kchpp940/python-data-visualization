@@ -3,184 +3,327 @@
     "type": "dash",
     "file": "dash_simple_app_1.py",
     "title": "Dash 简单示例 1",
-    "desc": "最基础的 Dash 直方图应用",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "dash", "plotly"]
+    "desc": "基础 Dash + Plotly 交互图表，使用油耗汇总数据",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "dash",
+      "plotly"
+    ]
   },
   "dash-2": {
     "type": "dash",
     "file": "dash_simple_app_2.py",
     "title": "Dash 简单示例 2",
-    "desc": "带交互的 Dash 应用",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "dash", "plotly"]
-  },
-  "dash-html": {
-    "type": "script",
-    "file": "dash_html_gen.py",
-    "title": "Dash HTML 生成脚本",
-    "desc": "生成静态 HTML 的 Dash 脚本（单次运行）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "dash", "plotly"]
+    "desc": "带下拉联动的 Dash 示例",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "dash",
+      "plotly"
+    ]
   },
   "dash-full": {
     "type": "dash",
     "file": "dash_full_app.py",
-    "title": "Dash 完整应用",
-    "desc": "包含 Pin Manager 的完整 Dash 仪表盘",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "dash", "plotly"]
+    "title": "Dash 完整油耗分析应用",
+    "desc": "包含 histogram 筛选、scatter 点选、pin 对比和 DataTable 的完整示例",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "dash",
+      "plotly"
+    ]
+  },
+  "dash-html": {
+    "type": "dash",
+    "file": "dash_html_gen.py",
+    "title": "Dash HTML 生成器",
+    "desc": "演示 Dash 的 html/dcc 组件",
+    "data_files": [],
+    "deps": [
+      "dash",
+      "plotly"
+    ]
   },
   "st-1": {
     "type": "streamlit",
     "file": "st_simple_1.py",
     "title": "Streamlit 简单示例 1",
-    "desc": "最基础的 Streamlit 应用",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "streamlit", "plotly"]
+    "desc": "Streamlit + Plotly 油耗汇总图",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "streamlit",
+      "plotly"
+    ]
   },
   "st-2": {
     "type": "streamlit",
     "file": "st_simple_2.py",
     "title": "Streamlit 简单示例 2",
-    "desc": "带多选与年份滑动条的 Streamlit 应用",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "streamlit", "plotly", "altair"]
+    "desc": "Streamlit 同时展示 Plotly 与 Altair",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "streamlit",
+      "plotly",
+      "altair"
+    ]
   },
   "st-sidebar": {
     "type": "streamlit",
     "file": "st_simple_sidebar.py",
     "title": "Streamlit Sidebar 示例",
-    "desc": "演示侧边栏交互的 Streamlit 应用",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "streamlit", "plotly"]
+    "desc": "带侧边栏的 Streamlit + Altair 示例",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "streamlit",
+      "plotly",
+      "altair"
+    ]
   },
   "nb-ch3-1": {
     "type": "notebook",
     "file": "ch3-exercise-1.ipynb",
     "title": "第 3 章 练习 1",
-    "desc": "Matplotlib 可视化基础（一）",
-    "data_files": ["EPA_fuel_economy.csv"],
-    "deps": ["pandas", "numpy", "matplotlib"]
+    "desc": "matplotlib 基础",
+    "data_files": [],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib"
+    ]
   },
   "nb-ch3-2": {
     "type": "notebook",
     "file": "ch3-exercise-2.ipynb",
     "title": "第 3 章 练习 2",
-    "desc": "Matplotlib 可视化基础（二）",
-    "data_files": ["EPA_fuel_economy.csv"],
-    "deps": ["pandas", "numpy", "matplotlib"]
+    "desc": "matplotlib 进阶",
+    "data_files": [],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib"
+    ]
   },
   "nb-ch3-3": {
     "type": "notebook",
     "file": "ch3-exercise-3.ipynb",
     "title": "第 3 章 练习 3",
-    "desc": "Matplotlib 可视化基础（三）",
-    "data_files": ["EPA_fuel_economy.csv"],
-    "deps": ["pandas", "numpy", "matplotlib"]
+    "desc": "matplotlib 练习",
+    "data_files": [
+      "EPA_fuel_economy.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib"
+    ]
   },
   "nb-ch4-1": {
     "type": "notebook",
     "file": "ch4-exercise-1.ipynb",
     "title": "第 4 章 练习 1",
-    "desc": "Pandas 绘图（一）",
-    "data_files": ["EPA_fuel_economy.csv"],
-    "deps": ["pandas", "numpy", "matplotlib"]
+    "desc": "pandas 基础",
+    "data_files": [
+      "EPA_fuel_economy.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib"
+    ]
   },
   "nb-ch4-2": {
     "type": "notebook",
     "file": "ch4-exercise-2.ipynb",
     "title": "第 4 章 练习 2",
-    "desc": "Pandas 绘图（二）",
-    "data_files": ["EPA_fuel_economy.csv"],
-    "deps": ["pandas", "numpy", "matplotlib"]
+    "desc": "pandas 进阶",
+    "data_files": [
+      "EPA_fuel_economy.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib"
+    ]
   },
   "nb-ch5-1": {
     "type": "notebook",
     "file": "ch5-exercise-1.ipynb",
     "title": "第 5 章 练习 1",
-    "desc": "Seaborn 统计可视化（一）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+    "desc": "seaborn 基础",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib",
+      "seaborn"
+    ]
   },
   "nb-ch5-2": {
     "type": "notebook",
     "file": "ch5-exercise-2.ipynb",
     "title": "第 5 章 练习 2",
-    "desc": "Seaborn 统计可视化（二）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+    "desc": "seaborn 进阶",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib",
+      "seaborn"
+    ]
   },
   "nb-ch5-3": {
     "type": "notebook",
     "file": "ch5-exercise-3.ipynb",
     "title": "第 5 章 练习 3",
-    "desc": "Seaborn 统计可视化（三）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+    "desc": "seaborn 练习",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib",
+      "seaborn"
+    ]
   },
   "nb-ch5-4": {
     "type": "notebook",
     "file": "ch5-exercise-4.ipynb",
     "title": "第 5 章 练习 4",
-    "desc": "Seaborn 统计可视化（四）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+    "desc": "seaborn 进阶练习",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "numpy",
+      "matplotlib",
+      "seaborn"
+    ]
   },
   "nb-ch6-1": {
     "type": "notebook",
     "file": "ch6-exercise-1.ipynb",
     "title": "第 6 章 练习 1",
-    "desc": "Altair 可视化（一）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "altair"]
+    "desc": "Altair 基础",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "altair",
+      "openpyxl",
+      "vegafusion",
+      "vl-convert-python"
+    ]
   },
   "nb-ch6-2": {
     "type": "notebook",
     "file": "ch6-exercise-2.ipynb",
     "title": "第 6 章 练习 2",
-    "desc": "Altair 可视化（二）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "altair"]
+    "desc": "Altair 进阶",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "altair",
+      "openpyxl",
+      "vegafusion",
+      "vl-convert-python"
+    ]
   },
   "nb-ch6-3": {
     "type": "notebook",
     "file": "ch6-exercise-3.ipynb",
     "title": "第 6 章 练习 3",
-    "desc": "Altair 可视化（三）",
-    "data_files": ["AmazonBooks.xlsx"],
-    "deps": ["pandas", "altair", "openpyxl"]
+    "desc": "Altair + Excel",
+    "data_files": [
+      "AmazonBooks.xlsx"
+    ],
+    "deps": [
+      "pandas",
+      "altair",
+      "openpyxl",
+      "vegafusion",
+      "vl-convert-python"
+    ]
   },
   "nb-ch7-1": {
     "type": "notebook",
     "file": "ch7-exercise-1.ipynb",
     "title": "第 7 章 练习 1",
-    "desc": "Plotly 交互可视化（一）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "plotly"]
+    "desc": "Plotly 基础",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "plotly",
+      "kaleido"
+    ]
   },
   "nb-ch7-2": {
     "type": "notebook",
     "file": "ch7-exercise-2.ipynb",
     "title": "第 7 章 练习 2",
-    "desc": "Plotly 交互可视化（二）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "plotly"]
+    "desc": "Plotly 进阶",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "plotly",
+      "kaleido"
+    ]
   },
   "nb-ch7-3": {
     "type": "notebook",
     "file": "ch7-exercise-3.ipynb",
     "title": "第 7 章 练习 3",
-    "desc": "Plotly 交互可视化（三）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "plotly"]
+    "desc": "Plotly 练习",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "plotly",
+      "kaleido"
+    ]
   },
   "nb-ch7-4": {
     "type": "notebook",
     "file": "ch7-exercise-4.ipynb",
     "title": "第 7 章 练习 4",
-    "desc": "Plotly 交互可视化（四）",
-    "data_files": ["EPA_fuel_economy_summary.csv"],
-    "deps": ["pandas", "plotly"]
+    "desc": "Plotly 导出",
+    "data_files": [
+      "EPA_fuel_economy_summary.csv"
+    ],
+    "deps": [
+      "pandas",
+      "plotly",
+      "kaleido"
+    ]
   }
 }

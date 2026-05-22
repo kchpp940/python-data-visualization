@@ -11,8 +11,6 @@ from typing import Iterable
 
 import pandas as pd
 
-from src.dataset_metadata import get_dataset
-
 
 # ---------------------------------------------------------------------------
 # 数据结构
@@ -40,8 +38,12 @@ class VehicleKey:
         return [self.make, self.model, self.year, self.transmission]
 
 
-_EPA_DATASET = get_dataset("epa_fuel_economy_summary")
-METRIC_COLS: dict[str, str] = _EPA_DATASET.get_metric_cols()
+METRIC_COLS: dict[str, str] = {
+    "city08": "城市油耗 (MPG)",
+    "highway08": "高速油耗 (MPG)",
+    "fuelCost08": "年燃油成本 ($)",
+    "co2": "CO2 排放 (g/mi)",
+}
 
 
 # ---------------------------------------------------------------------------

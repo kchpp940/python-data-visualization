@@ -17,17 +17,6 @@ Usage (first cell of any ch6 notebook)::
         init_chapter6,
     )
     init_chapter6()
-
-数据集加载（推荐方式，通过统一的数据说明服务）::
-
-    from src.dataset_service import get_service
-    df, info = get_service().notebook_init("epa_fuel_economy_summary")
-
-    # 或者直接加载
-    df = get_service().load("epa_fuel_economy_summary")
-
-    # 获取字段标签用于图表
-    labels = get_service().get_plotly_labels("epa_fuel_economy_summary")
 """
 
 from __future__ import annotations
@@ -250,30 +239,6 @@ def save_altair_chart(
     return saved
 
 
-def load_and_show_dataset(dataset_id: str, **kwargs) -> tuple[pd.DataFrame, dict]:
-    """加载数据集并显示基本信息。
-
-    方便 Notebook 中一键加载并预览数据集。
-
-    Returns
-    -------
-    (df, info)
-    """
-    from src.dataset_service import load_dataset, get_dataset_full_info
-
-    df = load_dataset(dataset_id, **kwargs)
-    info = get_dataset_full_info(dataset_id)
-
-    print(f"数据集: {info['name']}")
-    print(f"行数: {info['row_count']:,}, 列数: {info['column_count']}")
-    print(f"来源: {info['source']}")
-    print(f"标签: {', '.join(info['tags'])}")
-    print(f"\n前 5 行:")
-    print(df.head().to_string())
-
-    return df, info
-
-
 __all__ = [
     "REPO_ROOT",
     "RAW_DATA_DIR",
@@ -286,5 +251,4 @@ __all__ = [
     "init_chapter6",
     "read_excel_safe",
     "save_altair_chart",
-    "load_and_show_dataset",
 ]

@@ -13,21 +13,14 @@ from pin_manager import (  # noqa: E402
     build_comparison,
     remove_invalid,
 )
-from src.dataset_service import get_service  # noqa: E402
-from src.dataset_metadata import get_dataset  # noqa: E402
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
 
-DATASET_ID = "epa_fuel_economy_summary"
-dataset_service = get_service()
-dataset_meta = get_dataset(DATASET_ID)
-
-df = dataset_service.load(DATASET_ID)
-plotly_labels = dataset_service.get_plotly_labels(DATASET_ID)
-data_table_columns = dataset_service.get_dash_table_columns(DATASET_ID)
+src_file = Path(__file__).resolve().parent / "data" / "raw" / "EPA_fuel_economy_summary.csv"
+df = pd.read_csv(src_file)
 
 # Define the input parameters
 min_year = int(df["year"].min())
@@ -35,7 +28,17 @@ max_year = int(df["year"].max())
 all_years = sorted(df["year"].unique())
 transmission_types = df["transmission"].unique()
 
-data_table_cols = dataset_meta.default_display_fields
+data_table_cols = [
+    "make",
+    "model",
+    "year",
+    "transmission",
+    "drive",
+    "class_summary",
+    "cylinders",
+    "displ",
+    "fuelCost08",
+]
 
 # Need to keep track of button clicks to see if there is a change
 total_clicks = 0
@@ -99,7 +102,7 @@ app.layout = html.Div(
                             page_size=10,
                             row_selectable="multi",
                             selected_rows=[],
-                            columns=data_table_columns,
+                            columns=[{"name": i, "id": i} for i in data_table_cols],
                         ),
                     ],
                     style={"width": "60%", "display": "inline-block", "vertical-align": "top"},
@@ -181,7 +184,7 @@ def update_figure(year_range, transmission_list, selectedData, last_reset):
         filtered_df,
         x="fuelCost08",
         color="class_summary",
-        labels=plotly_labels,
+        labels={"fuelCost08": "Annual Fuel Cost"},
         nbins=40,
     )
 

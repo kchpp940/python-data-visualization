@@ -65,7 +65,7 @@ python launcher.py run nb-ch5      # 打开 Notebook
 
 ### 环境检查
 
-启动前可单独执行环境检查，明确区分三类问题：
+启动前可单独执行环境检查，明确区分四类问题：
 
 ```bash
 # 检查所有示例的环境就绪状态
@@ -75,20 +75,59 @@ python launcher.py check
 python launcher.py check dash-1
 ```
 
-检查结果会按 **缺依赖 / 缺数据文件 / 缺入口脚本** 三类分别列出，并给出对应解决方法。
+检查结果会按 **缺依赖 / 缺数据文件 / 缺入口脚本 / 缺启动器** 四类分别列出，并给出对应解决方法。
 
-### 示例清单维护
+### 配置文件分工
 
-所有示例注册在 `examples_manifest.json`，**新增示例无需修改 launcher.py**，只需在此文件追加一条记录：
+启动入口由两个 JSON 配置文件驱动，**职责分离、互不干扰**：
+
+| 文件 | 管什么 | 什么时候改 |
+|------|--------|------------|
+| `examples_manifest.json` | **示例列表** — 有哪些示例、叫什么、依赖哪些包/数据 | 新增或删除一个示例时 |
+| `launch_schema.json` | **类型启动规则** — 每种 `type` 用什么命令、什么参数、什么工作目录、有哪些 fallback | 改变某类示例的启动方式时（如换一个 notebook 启动器） |
+
+新增示例**只改 `examples_manifest.json`**，不需要动 `launch_schema.json`，也不需要改 `launcher.py`。
+
+### 新增示例（最小配置）
+
+在 `examples_manifest.json` 中追加一条记录。三种类型的最小配置如下：
+
+**Dash 应用**
 
 ```json
-"your-example-id": {
-  "type": "dash | streamlit | notebook",
-  "file": "script_file.py",
+"dash-your-id": {
+  "type": "dash",
+  "file": "your_dash_app.py",
   "title": "简短标题",
   "desc": "一句话描述",
-  "data_files": ["data_file.csv"],
-  "deps": ["pandas", "plotly"]
+  "data_files": ["EPA_fuel_economy_summary.csv"],
+  "deps": ["pandas", "dash", "plotly"]
+}
+```
+
+**Streamlit 应用**
+
+```json
+"st-your-id": {
+  "type": "streamlit",
+  "file": "your_streamlit_app.py",
+  "title": "简短标题",
+  "desc": "一句话描述",
+  "data_files": ["EPA_fuel_economy_summary.csv"],
+  "deps": ["pandas", "streamlit", "plotly"]
+}
+```
+
+**Jupyter Notebook**
+
+```json
+"nb-chX-Y": {
+  "type": "notebook",
+  "file": "chX-exercise-Y.ipynb",
+  "title": "第 X 章 练习 Y",
+  "desc": "一句话描述",
+  "data_files": ["EPA_fuel_economy.csv"],
+  "deps": ["pandas", "numpy", "matplotlib"]
 }
 ```
 
@@ -96,7 +135,7 @@ python launcher.py check dash-1
 
 | 字段 | 必填 | 说明 |
 |------|------|------|
-| `type` | ✅ | `dash` / `streamlit` / `notebook`，决定启动命令 |
+| `type` | ✅ | `dash` / `streamlit` / `notebook` / `script`，对应 `launch_schema.json` 中的启动规则 |
 | `file` | ✅ | 脚本文件名，相对于 `code/` 目录 |
 | `title` | ✅ | 显示在列表中的简短名称 |
 | `desc` | ✅ | 补充说明 |
@@ -105,102 +144,18 @@ python launcher.py check dash-1
 
 示例 ID 命名约定：`dash-*` / `st-*` / `nb-chX-Y`（第X章第Y题）。
 
----
+### 新增启动类型（高级）
 
-<!-- DATASET_INFO_START -->
-## 数据集说明
+如果需要支持一种全新的示例类型（例如 `bokeh` 或 `gradio`），在 `launch_schema.json` 中追加一条类型规则：
 
-> 本区块由 `DatasetService 自动生成，请勿手动编辑。
+```json
+"bokeh": {
+  "command": "{python}",
+  "args_template": ["-m", "bokeh", "serve", "{file}"],
+  "cwd": "code",
+  "check_package": "bokeh",
+  "fallbacks": []
+}
+```
 
-### Amazon 畅销书排行榜
-
-- **来源**: Kaggle - Amazon Top 50 Bestselling Books
-- **文件**: `AmazonBooks.xlsx`
-- **行数**: 600
-- **列数**: 7
-- **标签**: 图书, 电商, 评分
-
-Amazon 图书畅销榜数据，包含书名、作者、评分、评论数、价格、年份和 genre 分类。
-
-#### 字段说明
-
-| 字段名 | 显示名称 | 类型 | 单位 | 说明 | 缺失值 |
-|--------|----------|------|------|------|--------|
-| `Name` | 书名 | `str` | - | 图书名称 | 0 |
-| `Author` | 作者 | `str` | - | 图书作者 | 0 |
-| `User Rating` | 用户评分 | `float` | 星 | Amazon 用户平均评分 | 0 |
-| `Reviews` | 评论数 | `int` | - | 用户评论数量 | 0 |
-| `Price` | 价格 | `float` | $ | 图书售价 | 0 |
-| `Year` | 年份 | `int` | - | 上榜年份 | 0 |
-| `Genre` | 分类 | `str` | - | 图书类别（小说/非小说） | 0 |
-
-
----
-
-### EPA 燃油经济性数据集（完整版）
-
-- **来源**: https://www.fueleconomy.gov/
-- **文件**: `EPA_fuel_economy.csv`
-- **行数**: 24,210
-- **列数**: 14
-- **标签**: 燃油经济, 汽车, 环境, 原始数据
-
-美国环保署发布的完整车辆燃油经济性测试数据，包含更详细的传动系统和燃油类型信息。
-
-#### 字段说明
-
-| 字段名 | 显示名称 | 类型 | 单位 | 说明 | 缺失值 |
-|--------|----------|------|------|------|--------|
-| `make` | 品牌 | `str` | - | 车辆制造商 | 0 |
-| `model` | 型号 | `str` | - | 车型名称 | 0 |
-| `year` | 年份 | `int` | - | 生产年份 | 0 |
-| `cylinders` | 气缸数 | `int` | - | 发动机气缸数量 | 231 (0.95%) |
-| `trany` | 变速箱 | `str` | - | 变速器类型（原始字段名） | 9 (0.04%) |
-| `displ` | 排量 | `float` | L | 发动机排量（升） | 230 (0.95%) |
-| `VClass` | 车型分类 | `str` | - | EPA 车型分类 | 0 |
-| `co2` | CO2 排放 | `float` | g/mi | 二氧化碳排放量 | 0 |
-| `barrels08` | 年耗油量 | `float` | 桶/年 | 年度燃油消耗（桶） | 0 |
-| `fuelCost08` | 年燃油成本 | `float` | $ | 年度预计燃油成本 | 0 |
-| `fuelType` | 燃料类型 | `str` | - | 使用的燃料类型 | 0 |
-| `highway08` | 高速油耗 | `int` | MPG | 高速工况燃油经济性 | 0 |
-| `city08` | 城市油耗 | `int` | MPG | 城市工况燃油经济性 | 0 |
-| `comb08` | 综合油耗 | `int` | MPG | 综合工况燃油经济性 | 0 |
-
-
----
-
-### EPA 燃油经济性数据集（摘要版）
-
-- **来源**: https://www.fueleconomy.gov/
-- **文件**: `EPA_fuel_economy_summary.csv`
-- **行数**: 24,210
-- **列数**: 16
-- **标签**: 燃油经济, 汽车, 环境
-
-美国环保署发布的车辆燃油经济性测试数据摘要，包含各车型的油耗、排放、成本等指标。
-
-#### 字段说明
-
-| 字段名 | 显示名称 | 类型 | 单位 | 说明 | 缺失值 |
-|--------|----------|------|------|------|--------|
-| `make` | 品牌 | `str` | - | 车辆制造商 | 0 |
-| `model` | 型号 | `str` | - | 车型名称 | 0 |
-| `year` | 年份 | `int` | - | 生产年份 | 0 |
-| `transmission` | 变速箱 | `str` | - | 变速器类型 | 0 |
-| `drive` | 驱动方式 | `str` | - | 驱动轮配置（前驱/后驱/四驱） | 0 |
-| `date_range` | 日期范围 | `str` | - | 数据覆盖的时间范围 | 0 |
-| `fuel_type_summary` | 燃料类型 | `str` | - | 使用的燃料类型摘要 | 0 |
-| `class_summary` | 车型分类 | `str` | - | EPA 车型分类摘要 | 0 |
-| `cylinders` | 气缸数 | `int` | - | 发动机气缸数量 | 231 (0.95%) |
-| `displ` | 排量 | `float` | L | 发动机排量（升） | 230 (0.95%) |
-| `co2` | CO2 排放 | `float` | g/mi | 二氧化碳排放量 | 0 |
-| `barrels08` | 年耗油量 | `float` | 桶/年 | 年度燃油消耗（桶） | 0 |
-| `fuelCost08` | 年燃油成本 | `float` | $ | 年度预计燃油成本 | 0 |
-| `highway08` | 高速油耗 | `int` | MPG | 高速工况燃油经济性 | 0 |
-| `city08` | 城市油耗 | `int` | MPG | 城市工况燃油经济性 | 0 |
-| `comb08` | 综合油耗 | `int` | MPG | 综合工况燃油经济性 | 0 |
-
-
----
-
-<!-- DATASET_INFO_END -->
+然后在 `examples_manifest.json` 中使用 `"type": "bokeh"` 即可，无需修改任何 Python 代码。

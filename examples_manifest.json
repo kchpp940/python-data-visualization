@@ -1,0 +1,228 @@
+{
+  "_comment": "Example manifest for python-data-visualization. Keys are example IDs (used by `python launcher.py run <id>`). Each entry describes one runnable example: its type, entry file, title, description, required data files, and required Python packages. The type field maps to launch_schema.json, so adding a new example usually only requires adding an entry here.",
+
+  "dash-1": {
+    "type": "dash",
+    "file": "dash_simple_app_1.py",
+    "title": "Dash 简单直方图",
+    "desc": "最基础的 Dash 应用，展示一张静态直方图。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+
+  "dash-2": {
+    "type": "dash",
+    "file": "dash_simple_app_2.py",
+    "title": "Dash 带下拉框的直方图",
+    "desc": "带燃料类型多选下拉框的交互直方图。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+
+  "dash-full": {
+    "type": "dash",
+    "file": "dash_full_app.py",
+    "title": "Dash 完整应用（Pin 对比）",
+    "desc": "带 Pin/对比面板的完整燃油成本分析 Dash 应用。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "dash", "plotly"]
+  },
+
+  "dash-html": {
+    "type": "dash",
+    "file": "dash_html_gen.py",
+    "title": "Dash 纯 HTML 布局示例",
+    "desc": "展示 Dash 中 html 组件与 Markdown 的用法。",
+    "data_files": [],
+    "deps": ["dash", "plotly"]
+  },
+
+  "st-1": {
+    "type": "streamlit",
+    "file": "st_simple_1.py",
+    "title": "Streamlit 简单示例",
+    "desc": "用 Streamlit 渲染一张简单的 Plotly 直方图。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly"]
+  },
+
+  "st-2": {
+    "type": "streamlit",
+    "file": "st_simple_2.py",
+    "title": "Streamlit 多筛选示例",
+    "desc": "带厂牌多选与年份范围滑杆的 Streamlit 应用。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly", "altair"]
+  },
+
+  "st-sidebar": {
+    "type": "streamlit",
+    "file": "st_simple_sidebar.py",
+    "title": "Streamlit Sidebar 示例",
+    "desc": "将筛选控件放入 Sidebar 的 Streamlit 应用。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "streamlit", "plotly", "altair"]
+  },
+
+  "nb-ch3-1": {
+    "type": "notebook",
+    "file": "ch3-exercise-1.ipynb",
+    "title": "第 3 章 练习 1",
+    "desc": "Matplotlib 入门：读取 EPA 数据并绘图。",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+
+  "nb-ch3-2": {
+    "type": "notebook",
+    "file": "ch3-exercise-2.ipynb",
+    "title": "第 3 章 练习 2",
+    "desc": "Matplotlib 自定义样式。",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+
+  "nb-ch3-3": {
+    "type": "notebook",
+    "file": "ch3-exercise-3.ipynb",
+    "title": "第 3 章 练习 3",
+    "desc": "Matplotlib 子图与布局练习。",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+
+  "nb-ch4-1": {
+    "type": "notebook",
+    "file": "ch4-exercise-1.ipynb",
+    "title": "第 4 章 练习 1",
+    "desc": "Pandas 内置绘图入门。",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+
+  "nb-ch4-2": {
+    "type": "notebook",
+    "file": "ch4-exercise-2.ipynb",
+    "title": "第 4 章 练习 2",
+    "desc": "Pandas 绘图进阶。",
+    "data_files": ["EPA_fuel_economy.csv"],
+    "deps": ["pandas", "numpy", "matplotlib"]
+  },
+
+  "nb-ch5-1": {
+    "type": "notebook",
+    "file": "ch5-exercise-1.ipynb",
+    "title": "第 5 章 练习 1",
+    "desc": "Seaborn 统计可视化入门。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+
+  "nb-ch5-2": {
+    "type": "notebook",
+    "file": "ch5-exercise-2.ipynb",
+    "title": "第 5 章 练习 2",
+    "desc": "Seaborn 主题与样式。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+
+  "nb-ch5-3": {
+    "type": "notebook",
+    "file": "ch5-exercise-3.ipynb",
+    "title": "第 5 章 练习 3",
+    "desc": "Seaborn 进阶绘图。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+
+  "nb-ch5-4": {
+    "type": "notebook",
+    "file": "ch5-exercise-4.ipynb",
+    "title": "第 5 章 练习 4",
+    "desc": "Seaborn 综合练习。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "matplotlib", "seaborn"]
+  },
+
+  "nb-ch6-1": {
+    "type": "notebook",
+    "file": "ch6-exercise-1.ipynb",
+    "title": "第 6 章 练习 1",
+    "desc": "Altair 入门：EPA 数据集可视化。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl", "vegafusion"]
+  },
+
+  "nb-ch6-2": {
+    "type": "notebook",
+    "file": "ch6-exercise-2.ipynb",
+    "title": "第 6 章 练习 2",
+    "desc": "Altair 交互。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl", "vegafusion"]
+  },
+
+  "nb-ch6-3": {
+    "type": "notebook",
+    "file": "ch6-exercise-3.ipynb",
+    "title": "第 6 章 练习 3",
+    "desc": "Altair + AmazonBooks Excel 数据。",
+    "data_files": ["AmazonBooks.xlsx"],
+    "deps": ["pandas", "numpy", "altair", "openpyxl", "vegafusion"]
+  },
+
+  "nb-ch7-1": {
+    "type": "notebook",
+    "file": "ch7-exercise-1.ipynb",
+    "title": "第 7 章 练习 1",
+    "desc": "Plotly Express 入门。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly", "kaleido"]
+  },
+
+  "nb-ch7-2": {
+    "type": "notebook",
+    "file": "ch7-exercise-2.ipynb",
+    "title": "第 7 章 练习 2",
+    "desc": "Plotly 子图。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly", "kaleido"]
+  },
+
+  "nb-ch7-3": {
+    "type": "notebook",
+    "file": "ch7-exercise-3.ipynb",
+    "title": "第 7 章 练习 3",
+    "desc": "Plotly 动画与导出。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly", "kaleido"]
+  },
+
+  "nb-ch7-4": {
+    "type": "notebook",
+    "file": "ch7-exercise-4.ipynb",
+    "title": "第 7 章 练习 4",
+    "desc": "Plotly 综合练习。",
+    "data_files": ["EPA_fuel_economy_summary.csv"],
+    "deps": ["pandas", "numpy", "plotly", "kaleido"]
+  },
+
+  "static-html-gen": {
+    "type": "static",
+    "file": "dash_html_gen.py",
+    "title": "静态导出：Dash 页面",
+    "desc": "将 dash_html_gen.py 以 Dash 方式启动，作为静态演示入口（实际由 Dash 渲染）。",
+    "data_files": [],
+    "deps": ["dash", "plotly"]
+  },
+
+  "static-readme-images": {
+    "type": "static",
+    "file": "images/readme.md",
+    "title": "静态资源：README 图片目录说明",
+    "desc": "指向 code/images/ 目录的资源索引（不执行，仅浏览）。",
+    "data_files": [],
+    "deps": []
+  }
+}

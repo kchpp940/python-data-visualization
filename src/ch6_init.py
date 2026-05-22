@@ -1,29 +1,22 @@
-"""Chapter 6 notebook initialization — Altair backend on top of shared init.
+"""Chapter 6 notebook initialization — Altair backend, Excel reader, export helpers.
 
-This module re-exports everything from :mod:`src.nb_init` (path constants,
-``pandas``/``numpy``, dataset registry) and additionally imports
-:mod:`altair`, provides the Excel reader / chart-export helpers, and exposes
-:func:`init_chapter6` to configure the Altair backend.
+Only ``ch6-exercise-*.ipynb`` should import from this module. Other chapters
+continue to use the slim ``data_paths`` module for path constants only.
 
-The ``sys.path`` injection and data-path discovery that used to live here
-now live in :mod:`src.nb_init`; this module delegates to that shared layer
-and only adds chapter-6-specific logic (Altair, Excel, export).
+This module is side-effect free: importing it does **not** modify Altair's
+global state. Call ``init_chapter6()`` explicitly from the notebook setup cell
+to apply the recommended config (vegafusion backend, lifted row cap).
 
 Usage (first cell of any ch6 notebook)::
 
+    import sys; sys.path.insert(0, '..')
     from src.ch6_init import (
         RAW_DATA_DIR, IMAGES_DIR,
         pd, np, alt,
         read_excel_safe, save_altair_chart,
         init_chapter6,
-        datasets,
     )
-    status = init_chapter6()
-    status
-
-Importing this module is side-effect free — it does **not** modify Altair's
-global state. Call :func:`init_chapter6` explicitly from the notebook setup
-cell to apply the recommended config (vegafusion backend, lifted row cap).
+    init_chapter6()
 """
 
 from __future__ import annotations
@@ -32,22 +25,12 @@ import warnings
 from pathlib import Path
 from typing import Optional, Union
 
-import altair as alt  # noqa: F401,E402
+import numpy as np
+import pandas as pd
 
-from src.nb_init import (  # noqa: F401,E402
-    REPO_ROOT,
-    CODE_DIR,
-    DATA_DIR,
-    RAW_DATA_DIR,
-    IMAGES_DIR,
-    np,
-    pd,
-    datasets,
-    DatasetRegistry,
-    load_epa,
-    load_epa_summary,
-    load_amazon_books,
-)
+from data_paths import RAW_DATA_DIR, IMAGES_DIR, REPO_ROOT  # noqa: E402
+
+import altair as alt  # noqa: E402
 
 DEFAULT_LARGE_DATA_THRESHOLD: int = 200_000
 
@@ -176,7 +159,8 @@ def init_chapter6(
             status
 
     This is the **only** place where Altair's global state is mutated during
-    normal use.
+    normal use.  ``excel_reader`` and ``altair_export`` scripts import this
+    module without triggering any Altair configuration.
     """
     return configure_altair(backend=backend, disable_max_rows=True)
 
@@ -257,19 +241,12 @@ def save_altair_chart(
 
 __all__ = [
     "REPO_ROOT",
-    "CODE_DIR",
-    "DATA_DIR",
     "RAW_DATA_DIR",
     "IMAGES_DIR",
     "DEFAULT_LARGE_DATA_THRESHOLD",
     "alt",
     "np",
     "pd",
-    "datasets",
-    "DatasetRegistry",
-    "load_epa",
-    "load_epa_summary",
-    "load_amazon_books",
     "configure_altair",
     "init_chapter6",
     "read_excel_safe",
